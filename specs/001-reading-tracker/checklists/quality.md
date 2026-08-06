@@ -17,7 +17,7 @@
 ## Requirement Clarity
 
 - [ ] CHK006 Is "clear error message," used across FR-003/FR-005/FR-013/FR-015, defined with any consistent content or format expectation, or left fully to implementer discretion? [Clarity, Spec §FR-013]
-- [ ] CHK007 Is the search-result cap of "approximately 20" precise enough to be objectively verified, or does "approximately" leave the exact number ambiguous? [Clarity, Spec §FR-001]
+- [x] CHK007 Is the search-result cap of "approximately 20" precise enough to be objectively verified, or does "approximately" leave the exact number ambiguous? [Clarity, Spec §FR-001] — Resolved 2026-08-06: FR-001 now states an exact cap of 20.
 - [ ] CHK008 Is "session," as used for the search cache lifetime, defined precisely enough to distinguish it from a browser session versus the server process's lifetime? [Clarity, Spec §FR-016]
 
 ## Requirement Consistency
@@ -46,7 +46,7 @@
 
 ## Non-Functional Requirements
 
-- [ ] CHK021 Are the "identifying request headers" and "rate limit" obligations in FR-017 quantified within the requirement itself (specific header content, requests-per-second figure), or left unspecified? [Clarity, Spec §FR-017]
+- [x] CHK021 Are the "identifying request headers" and "rate limit" obligations in FR-017 quantified within the requirement itself (specific header content, requests-per-second figure), or left unspecified? [Clarity, Spec §FR-017] — Resolved 2026-08-06: FR-017 now states the User-Agent header content and the 3 requests/second limit explicitly.
 - [ ] CHK022 Are performance expectations defined for how quickly the personal list and statistics views must respond, independent of Open Library's own response time? [Gap, Non-Functional]
 - [ ] CHK023 Are requirements defined for how large the personal list can grow before persistence or display requirements are affected? [Gap, Non-Functional]
 

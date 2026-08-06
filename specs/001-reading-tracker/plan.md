@@ -47,11 +47,11 @@ enforced in one place, and so the browser never needs direct network access to a
 | II. Database Access | Parameterized queries only; no string concatenation of user input into SQL | All SQLite access goes through a single repository module using the driver's parameterized-statement API exclusively (see research.md) |
 | III. Persistence | User data survives restarts; viewing stored data never depends on external services | Personal list is stored in a SQLite file on disk; list/filter/progress/statistics endpoints read only from that file, never from Open Library, satisfying FR-014 |
 | IV. External Services | Follow provider usage guidelines (headers, rate limits, caching); graceful failure handling | A single Open Library client module sets the User-Agent header, throttles requests, and caches identical queries in memory (FR-016/FR-017); its failures are caught and surfaced as a clear user-facing message (FR-015), never an unhandled exception |
-| V. Testing | Functional requirements covered by automated Jest tests | Contract tests per endpoint, integration tests per user story (US1–US5), and unit tests for validation/progress/statistics logic, all in Jest |
+| V. Testing | Functional requirements covered by automated Jest tests | Contract tests per endpoint, integration tests per user story (US1–US5), and unit tests for validation/progress/statistics logic, all in Jest, including an automated restart-persistence test (FR-014/SC-003, tasks.md T050). One narrow exception is documented in Complexity Tracking below: FR-011's client-side-only cancel-confirmation scenario has no automated Jest test, since covering it would require a dependency outside the fixed stack |
 | VI. Simplicity | No frontend frameworks, no build step; minimal technology surface | Frontend is static HTML/CSS/vanilla JS served as-is by Express; stack is limited to Express + SQLite driver + Jest/Supertest, nothing else |
 | VII. Usability | UI understandable without separate instructions | Single-page UI with labeled search box, category selectors, visible progress bars/percentages, a labeled filter control, a labeled statistics panel, and an explicit remove-confirmation prompt — no separate docs needed |
 
-Initial gate result: **PASS** — no violations, Complexity Tracking left empty.
+Initial gate result (2026-08-06, before `/speckit-analyze`): **PASS** — no violations, Complexity Tracking left empty at that time. See the Post-`/speckit-analyze` re-check below for the one exception since added.
 
 **Post-Phase 1 re-check**: data-model.md, contracts/api.md, and quickstart.md were reviewed
 against the same seven principles after design. No new dependencies, storage mechanisms, or
@@ -59,6 +59,15 @@ external integrations were introduced beyond what Phase 0/1 already accounted fo
 table remains the only persisted entity; `PATCH`/`POST` validation in contracts/api.md maps
 directly to the data-model.md rules; the API contract still routes all Open Library access through
 the single backend client from research.md). Gate result: **PASS**, unchanged.
+
+**Post-`/speckit-analyze` re-check** (2026-08-06): Cross-artifact analysis surfaced two Principle V
+gaps, both now resolved or explicitly justified: (1) FR-014/SC-003 restart-persistence lacked an
+automated test — closed by adding tasks.md T050, an automated Jest test that reopens the SQLite
+file in a fresh `database.js` instance to prove data survives; (2) FR-011's client-side
+cancel-confirmation scenario cannot be automated within the fixed stack — documented as a single
+justified exception in Complexity Tracking below, per the constitution's Governance clause
+requiring explicit justification for any deviation. Gate result: **PASS with one documented
+exception**.
 
 ## Project Structure
 
@@ -115,4 +124,6 @@ and is served directly by the same Express process that hosts the API.
 
 > **Fill ONLY if Constitution Check has violations that must be justified**
 
-No violations — this section is intentionally empty.
+| Violation | Why Needed | Simpler Alternative Rejected Because |
+|-----------|------------|---------------------------------------|
+| FR-011's cancel-confirmation acceptance scenario (spec.md US5 Scenario 3: "user cancels, book remains unchanged") has no automated Jest test | Per contracts/api.md, the confirm/cancel dialog is entirely client-side — `DELETE /api/books/:id` is called only after the user confirms, and the server deletes unconditionally once called. There is no HTTP request to assert against for the cancel path, so it cannot be exercised through the contract/integration tests that cover the rest of FR-011 (T041, T042) | Testing the DELETE endpoint alone (already covered) cannot observe this behavior, since the endpoint has no awareness of confirmation. Rendering the confirm dialog through a DOM/browser test would require `jest-environment-jsdom`, which since Jest 27 is a separate npm package (not bundled with `jest`) — installing it would add a dependency outside the fixed technology stack (Node.js + Express, SQLite, plain HTML/CSS/JS, Jest). Per Constitution Principle VI (minimal technology surface) and the explicit stack constraint, this dependency is rejected in favor of documenting the gap here, as the Governance section requires ("any deviation MUST be justified explicitly"). Coverage for this single scenario instead relies on the quickstart.md US5 manual walkthrough (T051 references the persistence/offline scenarios; the US5 cancel scenario is exercised manually per quickstart.md US5, step 2) |

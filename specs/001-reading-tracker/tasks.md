@@ -9,7 +9,7 @@ description: "Task list template for feature implementation"
 
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/api.md, quickstart.md
 
-**Tests**: Included. Constitution Principle V requires every functional requirement to be covered by automated Jest tests, so contract, integration, and unit tests are part of the task list (not optional for this project).
+**Tests**: Included. Constitution Principle V requires every functional requirement to be covered by automated Jest tests, so contract, integration, and unit tests are part of the task list (not optional for this project). One narrow, explicitly documented exception exists — see plan.md's Complexity Tracking section — for the client-side-only cancel path of FR-011, which cannot be exercised through Jest without adding a dependency (`jest-environment-jsdom`) outside the fixed technology stack.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -63,9 +63,9 @@ Single deployable web app per plan.md Project Structure: `src/` (Express backend
 
 ### Tests for User Story 1
 
-- [ ] T014 [P] [US1] Contract test for `GET /api/search` in `tests/contract/search.contract.test.js` — valid query returns ≤20 results in the documented shape, empty/whitespace-only query returns 400, a simulated Open Library failure returns 502 (contracts/api.md)
+- [ ] T014 [P] [US1] Contract test for `GET /api/search` in `tests/contract/search.contract.test.js` — valid query returns ≤20 results in the documented shape, a query matching more than 20 books is truncated to 20, a result with no cover image omits/nulls `coverUrl` rather than failing, a query with no matches returns an empty results array (not an error), empty/whitespace-only query returns 400, a simulated Open Library failure returns 502 (contracts/api.md, spec.md Edge Cases)
 - [ ] T015 [P] [US1] Contract test for `POST /api/books` in `tests/contract/books-post.contract.test.js` — valid add returns 201 with the created entry, invalid `category`/`totalPages` returns 400, a duplicate `openLibraryWorkId` returns 409 (contracts/api.md)
-- [ ] T016 [P] [US1] Integration test for User Story 1's acceptance scenarios in `tests/integration/us1-search-and-add.test.js` — search-then-add end-to-end, duplicate-add rejection, empty-query rejection (spec.md US1, quickstart.md US1)
+- [ ] T016 [P] [US1] Integration test for User Story 1's acceptance scenarios in `tests/integration/us1-search-and-add.test.js` — search-then-add end-to-end, duplicate-add rejection, empty-query rejection, and adding a book whose search result had no cover image (spec.md US1, spec.md Edge Cases, quickstart.md US1)
 
 ### Implementation for User Story 1
 
@@ -155,13 +155,13 @@ Single deployable web app per plan.md Project Structure: `src/` (Express backend
 ### Tests for User Story 5
 
 - [ ] T041 [P] [US5] Contract test for `DELETE /api/books/:id` in `tests/contract/books-delete.contract.test.js` — successful delete returns 204 and the book is absent from a subsequent `GET /api/books`, unknown `id` returns 404 (contracts/api.md)
-- [ ] T042 [P] [US5] Integration test for User Story 5's acceptance scenarios in `tests/integration/us5-remove.test.js`, including that a removed book's `openLibraryWorkId` can be added again (spec.md US5, Clarifications session)
+- [ ] T042 [P] [US5] Integration test for User Story 5's acceptance scenarios in `tests/integration/us5-remove.test.js`, covering the API-observable parts: successful removal after confirmation, and that a removed book's `openLibraryWorkId` can be added again (spec.md US5, Clarifications session). The cancel-confirmation acceptance scenario (spec.md US5 Scenario 3) is client-side-only and out of scope for this test — see the documented exception in plan.md Complexity Tracking
 
 ### Implementation for User Story 5
 
 - [ ] T043 [US5] Implement the `DELETE /api/books/:id` route in `src/routes/books.js` using `bookRepository.deleteById` — depends on T009
 - [ ] T044 [US5] Add a `removeBook(id)` function to `public/js/api.js` — depends on T020
-- [ ] T045 [US5] Implement the remove button and confirmation dialog (confirm/cancel) wired to the list view in `public/js/app.js` and `public/index.html` — depends on T028, T044
+- [ ] T045 [US5] Implement the remove button and confirmation dialog (confirm/cancel) wired to the list view in `public/js/app.js` and `public/index.html` — depends on T028, T044. The confirm/cancel logic itself is not covered by an automated Jest test; see the documented exception in plan.md Complexity Tracking
 
 **Checkpoint**: All 5 user stories should now be independently functional
 
@@ -174,9 +174,10 @@ Single deployable web app per plan.md Project Structure: `src/` (Express backend
 - [ ] T046 [P] Unit tests for `src/validation/validators.js` (category enum, page-range, `totalPages > 0`, empty/whitespace query) in `tests/unit/validators.test.js`
 - [ ] T047 [P] Unit tests for the progress-percent rounding logic in `tests/unit/progress.test.js`
 - [ ] T048 [P] Unit tests for `bookRepository.aggregateStats`'s rounding and zero-"reading"-books behavior in `tests/unit/stats.test.js`
-- [ ] T049 [P] Unit tests for `openLibraryClient.js`'s rate limiting and query caching, using a mocked fetch, in `tests/unit/openLibraryClient.test.js`
-- [ ] T050 Run the quickstart.md persistence and offline-resilience scenarios manually (restart the server and confirm no data loss; simulate Open Library being unreachable and confirm a clear error with the list/stats views unaffected) and record the results
-- [ ] T051 Review every route's error responses for a consistent `{ "error": "..." }` shape and confirm no unhandled exception can reach the client (Constitution Principle I)
+- [ ] T049 [P] Unit tests for `openLibraryClient.js` in `tests/unit/openLibraryClient.test.js`, using a mocked fetch: rate limiting (no more than 3 requests/second), query caching, and that every outgoing request carries a `User-Agent` header containing the application name and the configured contact email (FR-017, spec.md)
+- [ ] T050 [P] Automated persistence test for FR-014/SC-003 in `tests/integration/persistence.test.js`: insert books through one `database.js`/`bookRepository.js` instance pointed at a temporary SQLite file, close that connection, open a fresh `database.js` instance against the same file (simulating a process restart without spawning a new OS process), and assert `bookRepository.listAll`/`aggregateStats` still return the inserted data — depends on T006, T009
+- [ ] T051 Run the quickstart.md persistence and offline-resilience scenarios manually as a supplementary sanity check (restart the server and confirm no data loss; simulate Open Library being unreachable and confirm a clear error with the list/stats views unaffected) and record the results
+- [ ] T052 Review every route's error responses for a consistent `{ "error": "..." }` shape and confirm no unhandled exception can reach the client (Constitution Principle I)
 
 ---
 

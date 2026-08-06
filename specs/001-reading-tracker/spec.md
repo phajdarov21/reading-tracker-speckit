@@ -115,7 +115,7 @@ A user removes a book they no longer want to track, after confirming the removal
 
 ### Functional Requirements
 
-- **FR-001**: System MUST allow the user to search for books by title or author, querying the external book search service (Open Library) and returning matching results, capped at approximately 20 results per search.
+- **FR-001**: System MUST allow the user to search for books by title or author, querying the external book search service (Open Library) and returning matching results, capped at 20 results per search.
 - **FR-002**: System MUST display, for each search result, the title, author, first publication year, and a cover image when one is available.
 - **FR-003**: System MUST reject search submissions with an empty query and show a clear message asking for a search term.
 - **FR-004**: System MUST allow the user to add a book from search results to their personal list, specifying an initial category (want to read / reading / finished) and the total number of pages.
@@ -131,7 +131,7 @@ A user removes a book they no longer want to track, after confirming the removal
 - **FR-014**: System MUST persist the personal list (including book details originally fetched from the external search service) so that viewing the list and statistics after an application restart, or while the external search service is unavailable, does not depend on that external service.
 - **FR-015**: When the external book search service is unavailable or returns an error, system MUST show the user a clear error message instead of failing unexpectedly.
 - **FR-016**: System MUST cache search results for identical queries during the running session, to avoid repeating the same request to the external search service.
-- **FR-017**: System MUST interact with the external book search service in a manner consistent with that service's usage policies (identifying the application in its requests and staying within request-rate limits).
+- **FR-017**: System MUST interact with the external book search service in a manner consistent with that service's usage policies: every request MUST carry a `User-Agent` header identifying the application by name and including a contact email, and the system MUST NOT send more than three requests per second to that service.
 - **FR-018**: System MUST NOT require user accounts, login, or authentication — the personal list is directly accessible to the single user.
 
 ### Key Entities
