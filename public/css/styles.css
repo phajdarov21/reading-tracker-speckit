@@ -1,0 +1,136 @@
+:root {
+  color-scheme: light dark;
+  --border-color: #ccc;
+  --error-color: #b00020;
+  --gap: 0.75rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0 auto;
+  max-width: 720px;
+  padding: 1rem;
+  line-height: 1.5;
+}
+
+header h1 {
+  margin-bottom: 0.5rem;
+}
+
+section {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  align-items: center;
+}
+
+label {
+  font-weight: 600;
+}
+
+.error {
+  color: var(--error-color);
+  font-weight: 600;
+}
+
+ul {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+
+li.book-card,
+li.result-card {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  gap: var(--gap);
+  align-items: flex-start;
+}
+
+li.book-card img,
+li.result-card img {
+  width: 48px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.book-details,
+.result-details {
+  flex: 1;
+}
+
+.progress-bar {
+  background: #e0e0e0;
+  border-radius: 4px;
+  height: 10px;
+  overflow: hidden;
+  margin-top: 0.25rem;
+}
+
+.progress-bar-fill {
+  background: #2e7d32;
+  height: 100%;
+}
+
+#stats-panel {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem var(--gap);
+  margin: 0;
+}
+
+#stats-panel dt {
+  font-weight: 600;
+}
+
+#stats-panel dd {
+  margin: 0;
+}
+
+.dialog {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog[hidden] {
+  display: none;
+}
+
+.dialog > * {
+  background: Canvas;
+  color: CanvasText;
+}
+
+.dialog p,
+.dialog button {
+  background: transparent;
+}
+
+.dialog {
+  padding: 1rem;
+}
+
+.dialog-box {
+  background: Canvas;
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 320px;
+}

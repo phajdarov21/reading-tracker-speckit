@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reading Tracker</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Reading Tracker</h1>
+  </header>
+
+  <main>
+    <section id="search-section" aria-labelledby="search-heading">
+      <h2 id="search-heading">Search for books</h2>
+      <form id="search-form">
+        <label for="search-query">Search by title or author</label>
+        <input id="search-query" name="q" type="text" autocomplete="off">
+        <button type="submit">Search</button>
+      </form>
+      <p id="search-error" class="error" role="alert" hidden></p>
+      <ul id="search-results" aria-label="Search results"></ul>
+    </section>
+
+    <section id="list-section" aria-labelledby="list-heading">
+      <h2 id="list-heading">My reading list</h2>
+
+      <div id="list-filter">
+        <label for="category-filter">Filter by category</label>
+        <select id="category-filter">
+          <option value="all">All</option>
+          <option value="want_to_read">Want to read</option>
+          <option value="reading">Reading</option>
+          <option value="finished">Finished</option>
+        </select>
+      </div>
+
+      <p id="list-error" class="error" role="alert" hidden></p>
+      <ul id="book-list" aria-label="Personal reading list"></ul>
+    </section>
+
+    <section id="stats-section" aria-labelledby="stats-heading">
+      <h2 id="stats-heading">Statistics</h2>
+      <dl id="stats-panel"></dl>
+    </section>
+  </main>
+
+  <div id="remove-confirm-dialog" class="dialog" role="alertdialog" aria-labelledby="remove-confirm-message" hidden>
+    <div class="dialog-box">
+      <p id="remove-confirm-message"></p>
+      <button id="remove-confirm-yes" type="button">Remove</button>
+      <button id="remove-confirm-cancel" type="button">Cancel</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
