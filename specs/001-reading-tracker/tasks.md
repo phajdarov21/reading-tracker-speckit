@@ -266,6 +266,6 @@ Task: "Integration test for User Story 1 in tests/integration/us1-search-and-add
 
 ## Phase 9: Convergence
 
-- [ ] T053 Fix `PATCH /api/books/:id` in `src/routes/books.js` so that a same-request `category: "finished"` always forces `currentPage`/`progressPercent` to 100%, even when `currentPage` is also present in the request body, and add a regression test covering the combined-fields case per contracts/api.md (contradicts)
-- [ ] T054 Add a unit test in `tests/unit/openLibraryClient.test.js` that mocks an Open Library response with more than 20 docs and asserts `search()` truncates the returned results to 20, per FR-001 Edge Case (partial)
-- [ ] T055 Add an `engines.node` field to `package.json` reflecting the actually-supported Node.js version range, and reconcile it with plan.md's Technical Context ("Node.js 20 LTS") and the `better-sqlite3` version pinned for the Node 24 environment used during implementation (partial)
+- [X] T053 Fix `PATCH /api/books/:id` in `src/routes/books.js` so that a same-request `category: "finished"` always forces `currentPage`/`progressPercent` to 100%, even when `currentPage` is also present in the request body, and add a regression test covering the combined-fields case per contracts/api.md (contradicts)
+- [X] T054 Add a unit test in `tests/unit/openLibraryClient.test.js` that mocks an Open Library response with more than 20 docs and asserts `search()` truncates the returned results to 20, per FR-001 Edge Case (partial)
+- [X] T055 Add an `engines.node` field to `package.json` reflecting the actually-supported Node.js version range, and reconcile it with plan.md's Technical Context ("Node.js 20 LTS") and the `better-sqlite3` version pinned for the Node 24 environment used during implementation (partial)

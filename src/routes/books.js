@@ -104,7 +104,11 @@ function createBooksRouter(bookRepository) {
       updated = bookRepository.updateCategory(id, category);
     }
 
-    if (currentPage !== undefined) {
+    // A same-request currentPage is ignored when the category is being set to
+    // "finished": updateCategory already forces currentPage/progressPercent to
+    // 100%, and contracts/api.md guarantees that forced value wins regardless
+    // of any currentPage also sent (FR-009).
+    if (currentPage !== undefined && category !== 'finished') {
       const currentPageError = validateCurrentPage(currentPage, updated.totalPages);
       if (currentPageError) {
         res.status(400).json({ error: currentPageError });

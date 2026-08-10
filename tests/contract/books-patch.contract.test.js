@@ -39,6 +39,20 @@ describe('PATCH /api/books/:id contract', () => {
     expect(res.body.progressPercent).toBe(100);
   });
 
+  test('a same-request currentPage is ignored when category is set to finished, per contracts/api.md', async () => {
+    const app = createTestApp();
+    const book = await addBook(app);
+
+    const res = await request(app)
+      .patch(`/api/books/${book.id}`)
+      .send({ category: 'finished', currentPage: 5 });
+
+    expect(res.status).toBe(200);
+    expect(res.body.category).toBe('finished');
+    expect(res.body.currentPage).toBe(200);
+    expect(res.body.progressPercent).toBe(100);
+  });
+
   test('a currentPage update alone never changes category, even when it equals totalPages', async () => {
     const app = createTestApp();
     const book = await addBook(app);

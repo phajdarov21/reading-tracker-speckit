@@ -48,6 +48,18 @@ describe('User Story 2 - Track reading progress', () => {
     expect(res.body.progressPercent).toBe(100);
   });
 
+  test('changing category to finished forces 100% even when a currentPage is sent in the same request', async () => {
+    const app = createTestApp();
+    const book = await addBook(app);
+
+    const res = await request(app)
+      .patch(`/api/books/${book.id}`)
+      .send({ category: 'finished', currentPage: 5 });
+
+    expect(res.body.currentPage).toBe(200);
+    expect(res.body.progressPercent).toBe(100);
+  });
+
   test('a current page above total or negative is rejected with a clear message', async () => {
     const app = createTestApp();
     const book = await addBook(app);

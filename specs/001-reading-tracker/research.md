@@ -15,6 +15,14 @@ for straightforward reads/writes) and avoids a class of race conditions when che
 Constitution Principle II. It is widely used, actively maintained, and has no native-build
 surprises beyond the standard prebuilt binaries.
 
+**Version note (added during implementation convergence)**: pinned to `^12.10.1`, the lowest
+major version with a prebuilt binary for the Node.js versions in play, and the one whose own
+`engines` field (`20.x || 22.x || 23.x || 24.x || 25.x || 26.x`) actually includes Node 20 LTS —
+matching plan.md's Technical Context. An earlier implementation pass had pinned `^13.0.3` to work
+around a broken local Python/node-gyp toolchain, but that version's `engines` field requires
+Node `>=22`, silently contradicting the plan's stated Node 20 LTS target; `package.json` now also
+declares this range explicitly via an `engines.node` field so the mismatch cannot recur silently.
+
 **Alternatives considered**:
 - `sqlite3` (node-sqlite3): callback/promise-based, more ceremony for the same parameterized
   queries, and its async nature complicates the "reject a duplicate add" check-then-insert flow.

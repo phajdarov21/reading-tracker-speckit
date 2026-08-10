@@ -54,6 +54,22 @@ describe('openLibraryClient', () => {
     expect(waitedMs).toBeLessThanOrEqual(334);
   });
 
+  test('truncates a response with more than 20 docs to 20 results', async () => {
+    const manyDocs = Array.from({ length: 30 }, (_, i) => ({
+      key: `/works/OL${i}W`,
+      title: `Book ${i}`,
+      author_name: ['An Author'],
+    }));
+    const fetchImpl = jest.fn().mockResolvedValue(fakeResponse(manyDocs));
+    const client = createOpenLibraryClient({ fetchImpl, sleep: async () => {} });
+
+    const results = await client.search('a very common query');
+
+    expect(results).toHaveLength(20);
+    expect(results[0].openLibraryWorkId).toBe('OL0W');
+    expect(results[19].openLibraryWorkId).toBe('OL19W');
+  });
+
   test('translates a network failure into a single clear error', async () => {
     const fetchImpl = jest.fn().mockRejectedValue(new Error('network down'));
     const client = createOpenLibraryClient({ fetchImpl, sleep: async () => {} });

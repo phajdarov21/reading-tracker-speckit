@@ -5,12 +5,15 @@
   "private": true,
   "main": "src/server.js",
   "type": "commonjs",
+  "engines": {
+    "node": "20.x || 22.x || 23.x || 24.x || 25.x || 26.x"
+  },
   "scripts": {
     "start": "node src/server.js",
     "test": "jest"
   },
   "dependencies": {
-    "better-sqlite3": "^13.0.3",
+    "better-sqlite3": "^12.10.1",
     "express": "^4.19.2"
   },
   "devDependencies": {
