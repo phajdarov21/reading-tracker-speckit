@@ -8,6 +8,7 @@ function makeResult(overrides = {}) {
     author: 'An Author',
     firstPublishYear: 2000,
     coverUrl: 'https://covers.openlibrary.org/b/id/1-M.jpg',
+    pageCount: 96,
     ...overrides,
   };
 }
@@ -29,6 +30,7 @@ describe('GET /api/search contract', () => {
     expect(first).toHaveProperty('author');
     expect(first).toHaveProperty('firstPublishYear');
     expect(first).toHaveProperty('coverUrl');
+    expect(first).toHaveProperty('pageCount');
   });
 
   test('a result with no cover image has a null coverUrl instead of failing', async () => {
@@ -39,6 +41,26 @@ describe('GET /api/search contract', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.results[0].coverUrl).toBeNull();
+  });
+
+  test('a result with a usable Open Library page count returns it as pageCount', async () => {
+    const openLibraryClient = createFakeOpenLibraryClient(async () => [makeResult({ pageCount: 320 })]);
+    const app = createTestApp({ openLibraryClient });
+
+    const res = await request(app).get('/api/search').query({ q: 'book with pages' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.results[0].pageCount).toBe(320);
+  });
+
+  test('a result with no Open Library page count has a null pageCount instead of failing', async () => {
+    const openLibraryClient = createFakeOpenLibraryClient(async () => [makeResult({ pageCount: null })]);
+    const app = createTestApp({ openLibraryClient });
+
+    const res = await request(app).get('/api/search').query({ q: 'book without pages' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.results[0].pageCount).toBeNull();
   });
 
   test('a query with no matches returns an empty results array, not an error', async () => {

@@ -56,6 +56,10 @@ function createCategorySelect(selectedValue) {
   return select;
 }
 
+function hasUsablePageCount(result) {
+  return Number.isInteger(result.pageCount) && result.pageCount > 0;
+}
+
 function createResultCard(result) {
   const li = document.createElement('li');
   li.className = 'result-card';
@@ -83,31 +87,41 @@ function createResultCard(result) {
   categoryLabel.textContent = 'Category';
   const categorySelect = createCategorySelect('want_to_read');
   categoryLabel.appendChild(categorySelect);
+  form.appendChild(categoryLabel);
 
-  const pagesLabel = document.createElement('label');
-  pagesLabel.textContent = 'Total pages';
-  const pagesInput = document.createElement('input');
-  pagesInput.type = 'number';
-  pagesInput.min = '1';
-  pagesInput.required = true;
-  pagesLabel.appendChild(pagesInput);
+  // Open Library already reported a usable page count for this result (FR-004),
+  // so no manual "Total pages" field is shown; otherwise fall back to manual
+  // entry with the same validation as before (FR-004a).
+  const autoFilled = hasUsablePageCount(result);
+  let pagesInput = null;
+  if (!autoFilled) {
+    const pagesLabel = document.createElement('label');
+    pagesLabel.textContent = 'Total pages';
+    pagesInput = document.createElement('input');
+    pagesInput.type = 'number';
+    pagesInput.min = '1';
+    pagesInput.required = true;
+    pagesLabel.appendChild(pagesInput);
+    form.appendChild(pagesLabel);
+  }
 
   const addButton = document.createElement('button');
   addButton.type = 'submit';
   addButton.textContent = 'Add to list';
+  form.appendChild(addButton);
 
   const errorEl = document.createElement('p');
   errorEl.className = 'error';
   errorEl.hidden = true;
+  form.appendChild(errorEl);
 
-  form.append(categoryLabel, pagesLabel, addButton, errorEl);
   details.appendChild(form);
   li.appendChild(details);
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     clearError(errorEl);
-    const totalPages = Number(pagesInput.value);
+    const totalPages = autoFilled ? result.pageCount : Number(pagesInput.value);
 
     try {
       await addBook({

@@ -83,4 +83,62 @@ describe('openLibraryClient', () => {
 
     await expect(client.search('anything')).rejects.toThrow(/temporarily unavailable/i);
   });
+
+  describe('pageCount mapping', () => {
+    test('requests number_of_pages_median explicitly via the fields parameter (Open Library omits it by default)', async () => {
+      const fetchImpl = jest.fn().mockResolvedValue(fakeResponse([]));
+      const client = createOpenLibraryClient({ fetchImpl, sleep: async () => {} });
+
+      await client.search('fantastic mr fox');
+
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      const [url] = fetchImpl.mock.calls[0];
+      expect(url).toMatch(/[?&]fields=/);
+      expect(url).toMatch(/number_of_pages_median/);
+    });
+
+    test('maps a positive integer number_of_pages_median to pageCount', async () => {
+      const fetchImpl = jest.fn().mockResolvedValue(fakeResponse([
+        { key: '/works/OL1W', title: 'Book', number_of_pages_median: 96 },
+      ]));
+      const client = createOpenLibraryClient({ fetchImpl, sleep: async () => {} });
+
+      const [result] = await client.search('book with pages');
+
+      expect(result.pageCount).toBe(96);
+    });
+
+    test('maps a missing number_of_pages_median to a null pageCount', async () => {
+      const fetchImpl = jest.fn().mockResolvedValue(fakeResponse([
+        { key: '/works/OL1W', title: 'Book' },
+      ]));
+      const client = createOpenLibraryClient({ fetchImpl, sleep: async () => {} });
+
+      const [result] = await client.search('book without pages');
+
+      expect(result.pageCount).toBeNull();
+    });
+
+    test('maps a zero number_of_pages_median to a null pageCount', async () => {
+      const fetchImpl = jest.fn().mockResolvedValue(fakeResponse([
+        { key: '/works/OL1W', title: 'Book', number_of_pages_median: 0 },
+      ]));
+      const client = createOpenLibraryClient({ fetchImpl, sleep: async () => {} });
+
+      const [result] = await client.search('book with zero pages');
+
+      expect(result.pageCount).toBeNull();
+    });
+
+    test('maps a non-integer number_of_pages_median to a null pageCount', async () => {
+      const fetchImpl = jest.fn().mockResolvedValue(fakeResponse([
+        { key: '/works/OL1W', title: 'Book', number_of_pages_median: 96.5 },
+      ]));
+      const client = createOpenLibraryClient({ fetchImpl, sleep: async () => {} });
+
+      const [result] = await client.search('book with fractional pages');
+
+      expect(result.pageCount).toBeNull();
+    });
+  });
 });

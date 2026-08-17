@@ -119,6 +119,8 @@ A user removes a book they no longer want to track, after confirming the removal
 - **FR-002**: System MUST display, for each search result, the title, author, first publication year, and a cover image when one is available.
 - **FR-003**: System MUST reject search submissions with an empty query and show a clear message asking for a search term.
 - **FR-004**: System MUST allow the user to add a book from search results to their personal list, specifying an initial category (want to read / reading / finished) and the total number of pages.
+
+  > **Superseded** (2026-08-16) by [`002-auto-fetch-page-count`](../002-auto-fetch-page-count/spec.md) FR-004: the total page count is now retrieved automatically from Open Library rather than entered manually, with a manual-entry fallback (FR-004a) only when Open Library has no usable page count. The wording above is left unchanged as a historical record of the original requirement.
 - **FR-005**: System MUST prevent the same book (identified by its Open Library work ID) from being added to the personal list more than once while it is currently on the list, and MUST show a clear message when a duplicate add is attempted. A book that has been removed (FR-011) is no longer considered a duplicate and MAY be added again.
 - **FR-006**: System MUST allow the user to view their personal list, showing each book's title, author, category, and progress percentage.
 - **FR-007**: System MUST allow the user to filter the personal list view by category (all / want to read / reading / finished).
